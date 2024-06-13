@@ -136,7 +136,6 @@ def main():
 
             # Group by Sector, Absense type, and year_month to count days
             test2 = expanded_df2[(expanded_df2['Absense type'] == 'أجازة عارضة') | (expanded_df2['Absense type'] == 'أجازة اعتيادية')]
-            st.dataframe(test2)
             result = test2.groupby(['Sector', 'year_month'], as_index=False).size()
 
             pivot_table12 = pd.pivot_table(result, index=['Sector'], columns=['year_month'], aggfunc='sum', fill_value=0)
