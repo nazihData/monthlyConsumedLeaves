@@ -97,6 +97,25 @@ def main():
             df2['Required Date Starting'] = pd.to_datetime(df2['Required Date Starting'])
             df2['Required Date Ending'] = pd.to_datetime(df2['Required Date Ending'])
 
+
+            # Define the list of specific dates to exclude
+            exclude_dates = [
+                pd.Timestamp('2024-01-01'),
+                pd.Timestamp('2024-01-07'),
+                pd.Timestamp('2024-01-25'),
+                pd.Timestamp('2024-04-09'),
+                pd.Timestamp('2024-04-10'),
+                pd.Timestamp('2024-04-11'),
+                pd.Timestamp('2024-04-14'),
+                pd.Timestamp('2024-04-25'),
+                pd.Timestamp('2024-06-16'),
+                pd.Timestamp('2024-06-17'),
+                pd.Timestamp('2024-06-18'),
+                pd.Timestamp('2024-06-19'),
+                pd.Timestamp('2024-06-20'),
+                pd.Timestamp('2024-05-05'),# Add specific dates here
+                pd.Timestamp('2024-05-06')
+            ]
             # Create a DataFrame with a row for each day in the range for each employee
             date_ranges2 = []
             for _, row2 in df2.iterrows():
@@ -105,14 +124,19 @@ def main():
                 end_date2 = row2['Required Date Ending']
                 absence_type2 = row2['Absense type']
                 for single_date2 in pd.date_range(start_date2, end_date2):
-                    date_ranges2.append({'Sector': sector2, 'Absense type': absence_type2, 'date': single_date2})
+                    if single_date2.weekday() not in [4, 5] and single_date2 not in exclude_dates:
+                        date_ranges2.append({'Sector': sector2, 'Absense type': absence_type2, 'date': single_date2})
+
+
+
+                    # date_ranges2.append({'Sector': sector2, 'Absense type': absence_type2, 'date': single_date2})
 
             expanded_df2 = pd.DataFrame(date_ranges2)
             expanded_df2['year_month'] = expanded_df2['date'].dt.strftime('%m %B')
 
             # Group by Sector, Absense type, and year_month to count days
             test2 = expanded_df2[(expanded_df2['Absense type'] == 'أجازة عارضة') | (expanded_df2['Absense type'] == 'أجازة اعتيادية')]
-
+            st.dataframe(test2)
             result = test2.groupby(['Sector', 'year_month'], as_index=False).size()
 
             pivot_table12 = pd.pivot_table(result, index=['Sector'], columns=['year_month'], aggfunc='sum', fill_value=0)
